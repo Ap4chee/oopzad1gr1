@@ -1,35 +1,51 @@
-import java.lang.Math;
+
 public class Segment {
-    private Point begin;
-    private Point end;
-
-    public Segment(Point begin, Point end) {
-        this.begin = begin;
-        this.end = end;
+    private Vec2 startVec2;
+    private Vec2 endVec2;
+    public Segment(Vec2 startVec2, Vec2 endVec2) {
+        this.startVec2 = startVec2;
+        this.endVec2 = endVec2;
     }
-
-    public void length() {
-        System.out.println(Math.sqrt(Math.pow((end.x - begin.x), 2) + Math.pow((end.y - begin.y), 2)));
+    public Vec2 getStartPoint() {
+        return startVec2;
     }
-    public static Segment[] perpendicularSegments(Segment segment, Point point){
-        double dx=segment.end.x-segment.begin.x;
-        double dy=segment.end.y-segment.begin.y;
+    public Vec2 getEndPoint() {
+        return endVec2;
+    }
+    public double length() {
+        return Math.sqrt(Math.pow(endVec2.x - startVec2.x, 2) + Math.pow(endVec2.y - startVec2.y, 2));
 
-        double perpDx1 = -dy;
-        double perpDy1 = dx;
-
-        double perpDx2 = dy;
-        double perpDy2 = -dx;
-
-        Point endPoint = new Point(point.x + perpDx1, point.y + perpDx1);
-        Point endPoint2 = new Point(point.x + perpDx2, point.y + perpDx2);
-
-        Segment segment1 = new Segment(point, endPoint);
-        Segment segment2 = new Segment(point, endPoint2);
-
-        return new Segment[]{segment1, segment2};
     }
     public String toSvg() {
-        return "<line x1='" + begin.x + "' y1='" + begin.y + "' x2='" + end.x + "' y2='" + end.y + "' stroke=\"black\" />";
+        return "<line x1='" + this.startVec2.x + "' y1='" + this.startVec2.y +
+                "' x2='" + this.endVec2.x + "' y2='" + this.endVec2.y +"' stroke='black' />";
+    }
+    @Override
+    public String toString() {
+        return this.toSvg();
+    }
+    public static Segment[] perpendicularSegments(Segment segment, Vec2 point) {
+        double dx = segment.getEndPoint().x - segment.getStartPoint().x;
+        double dy = segment.getEndPoint().y - segment.getStartPoint().y;
+        return new Segment[] {
+                new Segment(point, new Vec2(
+                        point.x - dy, point.y + dx
+                )),
+                new Segment(point, new Vec2(
+                        point.x + dy, point.y - dx
+                )),
+        };
+    }
+    public static Segment[] perpendicularSegments(Segment segment, Vec2 center, double length) {
+        double dx = ((segment.getEndPoint().getX() - segment.getStartPoint().getX())/segment.length())*length ;
+        double dy = ((segment.getEndPoint().getY() - segment.getStartPoint().getY())/segment.length())*length  ;
+        return new Segment[] {
+                new Segment(center, new Vec2(
+                        center.x - dy, center.y + dx
+                )),
+                new Segment(center, new Vec2(
+                        center.x + dy, center.y - dx
+                )),
+        };
     }
 }
